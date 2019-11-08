@@ -75,6 +75,8 @@ static int noconfig;
 int pal_emulation;
 int dendy;
 bool swapDuty;
+std::string saveDir;
+std::string screenshotDir;
 
 // -Video Modes Tag- : See --special
 static const char *DriverUsage=
@@ -136,7 +138,9 @@ static const char *DriverUsage=
 "                         to not save/load automatically provide a number\n"
 "                         greater than 9\n"
 "--periodicsaves {0|1}  enable automatic periodic saving.  This will save to\n"
-"                         the state passed to --savestate\n";
+"                         the state passed to --savestate\n"
+"--sshotdir     s       The directory to save screenshots\n"
+"--savedir      s       The directory to save games\n";
 
 
 // these should be moved to the man file
@@ -610,6 +614,19 @@ int main(int argc, char *argv[])
 		g_config->save();
 	
 	std::string s;
+
+	g_config->getOption("ScreenshotDirectory", &screenshotDir);
+	if( !screenshotDir.empty() ) {
+		char *cstr = new char[screenshotDir.length() + 1];
+		strcpy( cstr, screenshotDir.c_str() );
+		FCEUI_SetDirOverride( FCEUIOD_SNAPS, cstr );
+	}
+	g_config->getOption("SaveDirectory", &saveDir);
+	if( !saveDir.empty() ) {
+		char *cstr = new char[saveDir.length() + 1];
+		strcpy( cstr, saveDir.c_str() );
+		FCEUI_SetDirOverride( FCEUIOD_NV, cstr );
+	}
 
 	g_config->getOption("SDL.InputCfg", &s);
 	if(s.size() != 0)

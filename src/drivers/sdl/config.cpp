@@ -255,6 +255,9 @@ InitConfig()
 	config->addOption("_lastsavestateas", "SDL.LastSaveStateAs", home_dir);
 	config->addOption("_lastloadlua", "SDL.LastLoadLua", "");
     #endif
+
+	config->addOption("sshotdir", "ScreenshotDirectory", "");
+	config->addOption("savedir", "SaveDirectory", "");
     
 	// fcm -> fm2 conversion
 	config->addOption("fcmconvert", "SDL.FCMConvert", "");
@@ -365,7 +368,7 @@ InitConfig()
 		SDLK_PERIOD, // toggle frame display
 		SDLK_F10, // toggle subtitle
 		SDLK_F11, // reset
-		SDLK_F12, // screenshot
+		SDLK_s, // screenshot
 		SDLK_PAUSE, // pause
 		SDLK_MINUS, // speed++
 		SDLK_EQUALS, // speed--

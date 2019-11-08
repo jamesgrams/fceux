@@ -2256,7 +2256,7 @@ static GtkActionEntry normal_entries[] = {
 #ifdef _S9XLUA_H
 	{"LoadLuaScriptAction", GTK_STOCK_OPEN, "Load L_ua Script", "", NULL, G_CALLBACK(loadLua)},
 #endif
-	{"ScreenshotAction", NULL, "_Screenshot", "F12", NULL, G_CALLBACK(FCEUI_SaveSnapshot)},
+	{"ScreenshotAction", NULL, "_Screenshot", "<ctrl>S", NULL, G_CALLBACK(FCEUI_SaveSnapshot)},
 	{"QuitAction", GTK_STOCK_QUIT, "_Quit", "<control>Q", NULL, G_CALLBACK(quit)},
 	
 	{"OptionsMenuAction", NULL, "_Options"},
