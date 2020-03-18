@@ -551,7 +551,7 @@ static void KeyboardCommands ()
 	}
 
 	// Save a state from a file
-	if (keyonly (S) && is_alt)
+	if (is_alt && keyonly (S))
 	{
 		FCEUD_SaveStateAs ();
 	}
