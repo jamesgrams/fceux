@@ -1669,7 +1669,12 @@ static void CopySprites(uint8 *target) {
 	if (!rendersprites) return;	//User asked to not display sprites.
 
 	if(!SpriteON) return;
-	for(int i=0;i<256;i++)
+	
+	int start=8;
+	if(PPU[1] & 0x04)
+		start = 0;
+
+	for(int i=start;i<256;i++)
 	{
 		uint8 t = sprlinebuf[i];
 		if(!(t&0x80))
@@ -2198,7 +2203,7 @@ int FCEUX_PPU_Loop(int skip) {
 							{
 								pixel = addr & 0x1F;
 							}
-							pixelcolor = PALRAM[pixel];
+							pixelcolor = READPAL_MOTHEROFALL(pixel);
 						}
 
 						//generate the BG data

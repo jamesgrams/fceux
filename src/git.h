@@ -38,8 +38,9 @@ enum ESI
 	SI_MOUSE		= 6,
 	SI_SNES			= 7,
 	SI_SNES_MOUSE	= 8,
+	SI_VIRTUALBOY	= 9,
 
-	SI_COUNT = SI_SNES_MOUSE
+	SI_COUNT = SI_VIRTUALBOY
 };
 
 inline const char* ESI_Name(ESI esi)
@@ -54,7 +55,8 @@ inline const char* ESI_Name(ESI esi)
 		"Arkanoid Paddle",
 		"Subor Mouse",
 		"SNES Pad",
-		"SNES Mouse"
+		"SNES Mouse",
+		"Virtual Boy"
 	};
 
 	if(esi >= SI_NONE && esi <= SI_COUNT)
@@ -82,8 +84,9 @@ enum ESIFC
 	SIFC_OEKAKIDS	= 12,
 	SIFC_BWORLD		= 13,
 	SIFC_TOPRIDER	= 14,
+	SIFC_FAMINETSYS = 15,
 
-	SIFC_COUNT = SIFC_TOPRIDER
+	SIFC_COUNT = SIFC_FAMINETSYS
 };
 
 
@@ -105,7 +108,8 @@ inline const char* ESIFC_Name(ESIFC esifc)
 		"Family Trainer B",
 		"Oeka Kids Tablet",
 		"Barcode World",
-		"Top Rider"
+		"Top Rider",
+		"Famicom Network Controller"
 	};
 
 	if(esifc >= SIFC_NONE && esifc <= SIFC_COUNT)

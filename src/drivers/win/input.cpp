@@ -93,6 +93,7 @@ static uint8 HyperShotData=0;
 static uint32 MahjongData=0;
 static uint32 FTrainerData=0;
 static uint8 TopRiderData=0;
+static uint32 FamiNetSysData = 0;
 
 static uint8 BWorldData[1+13+1];
 
@@ -104,6 +105,7 @@ static void UpdateHyperShot(void);
 static void UpdateMahjong(void);
 static void UpdateFTrainer(void);
 static void UpdateTopRider(void);
+static void UpdateFamiNetSys(void);
 
 static uint32 snespad_return[4];
 static uint32 JSreturn=0;
@@ -396,6 +398,36 @@ static uint32 UpdatePPadData(int w)
 }
 
 
+ButtConfig virtualboysc[2][14]={
+	{
+		MK(K),MK(J),MK(E),MK(R),
+		MK(W),MK(S),MK(A),MK(D),
+		MK(L),MK(I),MK(Q),MK(O),
+		MK(Y),MK(U)
+	},
+	{
+		MK(K),MK(J),MK(E),MK(R),
+		MK(W),MK(S),MK(A),MK(D),
+		MK(L),MK(I),MK(Q),MK(O),
+		MK(Y),MK(U)
+	}
+};
+
+static uint32 virtualboybuf[2];
+
+static uint32 UpdateVirtualBoyData(int w)
+{
+	uint32 r=0;
+	ButtConfig *virtualboytsc=virtualboysc[w];
+	int x;
+
+	for(x=0;x<14;x++)
+		if(DTestButton(&virtualboytsc[x])) r|=1<<x;
+
+	return r;
+}
+
+
 static uint8 fkbkeys[0x48];
 static uint8 suborkbkeys[0x65];
 
@@ -442,6 +474,9 @@ void FCEUD_UpdateInput()
 			case SI_POWERPADB:
 				powerpadbuf[x]=UpdatePPadData(x);
 				break;
+			case SI_VIRTUALBOY:
+				virtualboybuf[x]=UpdateVirtualBoyData(x);
+				break;
 		}
 
 		switch(InputType[2])
@@ -463,6 +498,7 @@ void FCEUD_UpdateInput()
 		case SIFC_FTRAINERB:
 		case SIFC_FTRAINERA: UpdateFTrainer();break;
 		case SIFC_TOPRIDER: UpdateTopRider();break;
+		case SIFC_FAMINETSYS: UpdateFamiNetSys(); break;
 		case SIFC_OEKAKIDS: mouse=true; break;
 		}
 
@@ -528,6 +564,9 @@ void InitInputPorts(bool fourscore)
 			case SI_SNES:
 				InputDPtr=snespad_return;
 				break;
+			case SI_VIRTUALBOY:
+				InputDPtr=&virtualboybuf[i];
+				break;
 			}
 			FCEUI_SetInput(i,(ESI)InputType[i],InputDPtr,attrib);
 		}
@@ -565,6 +604,9 @@ void InitInputPorts(bool fourscore)
 		break;
 	case SIFC_TOPRIDER:
 		InputDPtr=&TopRiderData;
+		break;
+	case SIFC_FAMINETSYS:
+		InputDPtr = &FamiNetSysData;
 		break;
 	case SIFC_BWORLD:
 		InputDPtr=BWorldData;
@@ -718,6 +760,27 @@ static void UpdateTopRider(void)
 			TopRiderData|=1<<x;
 }
 
+ButtConfig FamiNetSysButtons[24] =
+{
+	MK(V),MK(C),MK(X),MK(Z),MK(BL_CURSORUP),MK(BL_CURSORDOWN),MK(BL_CURSORLEFT),MK(BL_CURSORRIGHT),
+	MK(0),MK(1),MK(2),MK(3),MK(4),MK(5),MK(6),MK(7),
+	MK(8),MK(9),MK(ASTERISK),MK(KP_PLUS),MK(KP_DELETE),MK(KP_MINUS),MK(ESCAPE),MK(BACKSPACE)
+};
+
+// A B SEL ST * # .	  C x EndComm
+// V C X   Z  * + DEL - x BS
+
+static void UpdateFamiNetSys(void)
+{
+	int x;
+	FamiNetSysData = 0;
+	for (x = 0; x<24; x++) {
+		if (DTestButton(&FamiNetSysButtons[x]))
+			FamiNetSysData |= 1 << x;
+	}
+	FamiNetSysData &= 0x00BFFFFF;	// bit22 must be zero
+}
+
 ButtConfig FTrainerButtons[12]=
 {
 	MK(O),MK(P),MK(BRACKET_LEFT),
@@ -754,6 +817,7 @@ CFGSTRUCT InputConfig[]={
 	AC(GamePadPreset3),
 	AC(fkbmap),
 	AC(suborkbmap),
+	AC(virtualboysc),
 	ENDCFGSTRUCT
 };
 
@@ -785,6 +849,10 @@ void InitInputStuff(void)
 		JoyClearBC(&MahjongButtons[x]);
 	for(x=0; x<4; x++)
 		JoyClearBC(&HyperShotButtons[x]);
+
+	for(x=0; x<2; x++)
+		for(y=0; y<14; y++)
+			JoyClearBC(&virtualboysc[x][y]);
 }
 
 static char *MakeButtString(ButtConfig *bc)
@@ -1121,7 +1189,7 @@ const unsigned int NUMBER_OF_PORTS = 2;
 const unsigned int NUMBER_OF_NES_DEVICES = SI_COUNT + 1;
 const static unsigned int NUMBER_OF_FAMICOM_DEVICES = SIFC_COUNT + 1;
 //these are unfortunate lists. they match the ESI and ESIFC enums
-static const int configurable_nes[NUMBER_OF_NES_DEVICES]= { 0, 1, 0, 1, 1, 0, 0, 1 };
+static const int configurable_nes[NUMBER_OF_NES_DEVICES]= { 0, 1, 0, 1, 1, 0, 0, 1, 0, 1 };
 static const int configurable_fam[NUMBER_OF_FAMICOM_DEVICES]= { 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0 };
 const unsigned int FAMICOM_POSITION = 2;
 
@@ -1449,6 +1517,10 @@ INT_PTR CALLBACK InputConCallB(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lP
 					case SI_POWERPADA:
 					case SI_POWERPADB:
 						DoTBConfig(hwndDlg, text, "POWERPADDIALOG", powerpadsc[which], 12);
+						break;
+
+					case SI_VIRTUALBOY:
+						DoTBConfig(hwndDlg, text, "VIRTUALBOYDIALOG", virtualboysc[which], 14);
 						break;
 					}
 				}
